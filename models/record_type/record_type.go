@@ -1,4 +1,4 @@
-package models
+package record_type
 
 import "fmt"
 
@@ -26,4 +26,12 @@ func (p *RecordType) String() string {
 
 func (p *RecordType) Type() string {
 	return "RecordType"
+}
+
+func (p *RecordType) ToQTYPE() (uint16, error) {
+	value, exists := QTYPEMap[*p]
+	if exists {
+		return value, nil
+	}
+	return 0, fmt.Errorf("invalid QType %s", *p)
 }
