@@ -1,0 +1,30 @@
+version: '3'
+
+vars:
+  NAME: gons
+
+tasks:
+  default:
+    cmds:
+      - task: build
+
+  init:
+    cmds:
+      - go install github.com/spf13/cobra-cli@latest
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.2
+
+  build:
+    cmds:
+      - go build -o {{.NAME}} -ldflags "-X cmd.version={{.GIT_VERSION}} -X cmd.commit={{.GIT_COMMIT}} -X cmd.buildTime={{.BUILD_TIME}} -s -w "
+    vars:
+      GIT_VERSION:
+        sh: git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git rev-parse --short HEAD
+      GIT_COMMIT:
+        sh: git log -n 1 --format=%h
+      BUILD_TIME:
+        sh: date '+%Y-%m-%d_%H:%M:%S'
+
+  lint:
+    desc: "lint the code"
+    cmds:
+      - golangci-lint run
