@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var recordType models.RecordType
+
 var rootCmd = &cobra.Command{
 	Use:   "main",
 	Short: "A brief description of your application",
@@ -26,7 +28,8 @@ to quickly create a Cobra application.`,
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Println(domain)
+		dnsQuery := models.DNSQuery{RecordType: recordType, Domain: *domain}
+		fmt.Printf(dnsQuery.String())
 	},
 }
 
@@ -38,5 +41,11 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().VarP(&recordType, "type", "t", "Type of record")
+
+	err := rootCmd.MarkFlagRequired("type")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
