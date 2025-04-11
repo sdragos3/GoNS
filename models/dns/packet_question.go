@@ -1,4 +1,4 @@
-package dns_packet
+package dns
 
 import (
 	"bytes"
@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-type DNSPacketQuestion struct {
+type PacketQuestion struct {
 	Domain string
 	Type   uint16
 	Class  uint16
 }
 
-func (q *DNSPacketQuestion) Encode() []byte {
+func (q *PacketQuestion) Encode() []byte {
 	var buffer bytes.Buffer
 
 	domainParts := strings.Split(q.Domain, ".")

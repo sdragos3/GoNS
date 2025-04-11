@@ -1,6 +1,8 @@
-package record_type
+package dns
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type RecordType string
 

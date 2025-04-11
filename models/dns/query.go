@@ -1,7 +1,7 @@
-package query
+package dns
 
 import (
-	dns_packet2 "main/models/dns_packet"
+	"main/models"
 )
 
 const queryIdentifier uint16 = 0xAAAA // query identifier
@@ -17,25 +17,30 @@ const answerCount uint16 = 0x0000     // mainly used for dns response packets
 const nameServerCount uint16 = 0x0000
 const additionalRecordCount uint16 = 0x0000
 
+type Query struct {
+	RecordType RecordType
+	Domain     models.Domain
+}
+
 func (dq *Query) String() string {
 	return string(dq.RecordType) + "." + dq.Domain.String()
 }
 
-func buildPacketQuestions(query *Query) ([]dns_packet2.DNSPacketQuestion, error) {
+func buildPacketQuestions(query *Query) ([]PacketQuestion, error) {
 	qtype, err := query.RecordType.ToQTYPE()
 	if err != nil {
 		return nil, err
 	}
-	question := dns_packet2.DNSPacketQuestion{
+	question := PacketQuestion{
 		Domain: query.Domain.Value,
 		Type:   qtype,
 		Class:  questionClass,
 	}
-	return []dns_packet2.DNSPacketQuestion{question}, nil
+	return []PacketQuestion{question}, nil
 }
 
-func buildPacketHeader() dns_packet2.DNSPacket {
-	return dns_packet2.DNSPacket{
+func buildPacketHeader() Packet {
+	return Packet{
 		ID:      queryIdentifier,
 		RD:      recursionDesired,
 		QR:      packetType,
@@ -50,7 +55,7 @@ func buildPacketHeader() dns_packet2.DNSPacket {
 	}
 }
 
-func (dq *Query) ToDNSPacket() (dns_packet2.DNSPacket, error) {
+func (dq *Query) ToDNSPacket() (Packet, error) {
 	queryPacket := buildPacketHeader()
 	questions, err := buildPacketQuestions(dq)
 	if err != nil {

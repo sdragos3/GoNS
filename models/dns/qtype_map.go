@@ -1,4 +1,4 @@
-package record_type
+package dns
 
 var QTYPEMap = map[RecordType]uint16{
 	A:     1,

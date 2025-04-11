@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"main/models"
-	"main/models/query"
-	"main/models/record_type"
+	"main/models/dns"
 	"os"
 )
 
-var recordType record_type.RecordType
+var recordType dns.RecordType
 
 var rootCmd = &cobra.Command{
 	Use:   "main",
@@ -30,7 +29,7 @@ to quickly create a Cobra application.`,
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		dnsQuery := query.Query{RecordType: recordType, Domain: *domain}
+		dnsQuery := dns.Query{RecordType: recordType, Domain: *domain}
 		fmt.Printf(dnsQuery.String())
 	},
 }
