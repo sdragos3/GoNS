@@ -17,11 +17,11 @@ type Client struct {
 	lastWriteSize uint
 }
 
-func NewClient(host string, port uint16, protocol models.Protocol) Client {
+func NewClient(server Server, protocol models.Protocol) Client {
 	return Client{
 		connection:    nil,
-		host:          host,
-		port:          port,
+		host:          server.Host,
+		port:          server.Port,
 		protocol:      string(protocol),
 		lastWriteSize: 0,
 	}
@@ -42,19 +42,18 @@ func (client *Client) Connect() error {
 	return nil
 }
 
-func (client *Client) Send(packet *Packet) error {
+func (client *Client) Send(packet *Packet) (int, error) {
 	encodedPacket := packet.Encode()
 	n, err := client.connection.Write(encodedPacket)
 	if err != nil {
-		return err
+		return n, err
 	}
 	client.lastWriteSize = uint(n)
-	return nil
+	return n, nil
 }
 
 func (client *Client) Receive() error {
 	encodedAnswer := make([]byte, client.lastWriteSize)
-	fmt.Printf("zedzedz")
 	if _, err := bufio.NewReader(client.connection).Read(encodedAnswer); err != nil {
 		log.Fatal(err)
 	}

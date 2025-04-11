@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"main/models"
 	"main/models/dns"
@@ -10,6 +11,7 @@ import (
 )
 
 var recordType dns.RecordType
+var verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "main",
@@ -25,13 +27,17 @@ to quickly create a Cobra application.`,
 			fmt.Println("Error: Domain is required")
 			os.Exit(1)
 		}
+		if !verbose {
+			log.SetLevel(log.PanicLevel)
+		}
 		domain, err := models.ParseDomain(args[0])
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		log.Info("Query: ", recordType.String(), ".", domain)
 		dnsQuery := dns.Query{RecordType: recordType, Domain: *domain}
-		err = resolver.Run(&dnsQuery)
+		err = resolver.Run(&dnsQuery, dns.DefaultServer())
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -48,6 +54,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().VarP(&recordType, "type", "t", "Type of record")
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	err := rootCmd.MarkFlagRequired("type")
 	if err != nil {
