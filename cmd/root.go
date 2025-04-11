@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"main/models"
 	"main/models/dns"
+	"main/resolver"
 	"os"
 )
 
@@ -30,7 +31,11 @@ to quickly create a Cobra application.`,
 			os.Exit(1)
 		}
 		dnsQuery := dns.Query{RecordType: recordType, Domain: *domain}
-		fmt.Printf(dnsQuery.String())
+		err = resolver.Run(&dnsQuery)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	},
 }
 

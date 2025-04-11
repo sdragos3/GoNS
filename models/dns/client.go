@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"main/models"
@@ -9,19 +10,21 @@ import (
 )
 
 type Client struct {
-	connection net.Conn
-	host       string
-	port       uint16
-	protocol   string
+	connection    net.Conn
+	host          string
+	port          uint16
+	protocol      string
+	lastWriteSize uint
 }
 
-func New(host string, port uint16, protocol models.Protocol) (Client, error) {
+func NewClient(host string, port uint16, protocol models.Protocol) Client {
 	return Client{
-		connection: nil,
-		host:       host,
-		port:       port,
-		protocol:   string(protocol),
-	}, nil
+		connection:    nil,
+		host:          host,
+		port:          port,
+		protocol:      string(protocol),
+		lastWriteSize: 0,
+	}
 }
 
 func (client *Client) Connect() error {
@@ -36,6 +39,26 @@ func (client *Client) Connect() error {
 		log.Fatal("failed to set deadline: ", err)
 	}
 	client.connection = conn
+	return nil
+}
+
+func (client *Client) Send(packet *Packet) error {
+	encodedPacket := packet.Encode()
+	n, err := client.connection.Write(encodedPacket)
+	if err != nil {
+		return err
+	}
+	client.lastWriteSize = uint(n)
+	return nil
+}
+
+func (client *Client) Receive() error {
+	encodedAnswer := make([]byte, client.lastWriteSize)
+	fmt.Printf("zedzedz")
+	if _, err := bufio.NewReader(client.connection).Read(encodedAnswer); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf(">> encodedAnswer: %#x\n", encodedAnswer)
 	return nil
 }
 

@@ -55,7 +55,7 @@ func buildPacketHeader() Packet {
 	}
 }
 
-func (dq *Query) ToDNSPacket() (Packet, error) {
+func (dq *Query) ToPacket() (Packet, error) {
 	queryPacket := buildPacketHeader()
 	questions, err := buildPacketQuestions(dq)
 	if err != nil {
