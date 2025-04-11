@@ -25,7 +25,7 @@ to quickly create a Cobra application.`,
 			fmt.Println("Error: Domain is required")
 			os.Exit(1)
 		}
-		domain, err := models.DomainParse(args[0])
+		domain, err := models.ParseDomain(args[0])
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
