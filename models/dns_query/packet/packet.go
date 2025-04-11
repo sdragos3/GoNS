@@ -1,5 +1,10 @@
 package packet
 
+import (
+	"bytes"
+	"main/utils"
+)
+
 type DNSQueryPacket struct {
 	ID        uint16
 	QR        bool
@@ -17,8 +22,32 @@ type DNSQueryPacket struct {
 	Questions []DNSPacketQuestion
 }
 
-type DNSPacketQuestion struct {
-	Domain string
-	Type   uint16
-	Class  uint16
+func (q *DNSQueryPacket) Encode() []byte {
+	var buffer bytes.Buffer
+
+	utils.WriteOrPanic(&buffer, q.ID)
+
+	b2i := func(b bool) int {
+		if b {
+			return 1
+		}
+
+		return 0
+	}
+
+	queryParams1 := byte(b2i(q.QR)<<7 | int(q.Opcode)<<3 | b2i(q.AA)<<1 | b2i(q.RD))
+	queryParams2 := byte(b2i(q.RA)<<7 | int(q.Z)<<4)
+
+	utils.WriteOrPanic(&buffer, queryParams1)
+	utils.WriteOrPanic(&buffer, queryParams2)
+	utils.WriteOrPanic(&buffer, q.QDCount)
+	utils.WriteOrPanic(&buffer, q.ANCount)
+	utils.WriteOrPanic(&buffer, q.NSCount)
+	utils.WriteOrPanic(&buffer, q.ARCount)
+
+	for _, question := range q.Questions {
+		buffer.Write(question.Encode())
+	}
+
+	return buffer.Bytes()
 }
