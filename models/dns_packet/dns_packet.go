@@ -1,11 +1,11 @@
-package packet
+package dns_packet
 
 import (
 	"bytes"
 	"main/utils"
 )
 
-type DNSQueryPacket struct {
+type DNSPacket struct {
 	ID        uint16
 	QR        bool
 	Opcode    uint8
@@ -22,7 +22,7 @@ type DNSQueryPacket struct {
 	Questions []DNSPacketQuestion
 }
 
-func (q *DNSQueryPacket) Encode() []byte {
+func (q *DNSPacket) Encode() []byte {
 	var buffer bytes.Buffer
 
 	utils.WriteOrPanic(&buffer, q.ID)
